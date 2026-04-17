@@ -1,0 +1,10 @@
+import flet as ft
+
+def main(page: ft.Page):
+
+    audio = ft.Audio(src="music.mp3", autoplay=True)
+
+    page.overlay.append(audio)
+    page.update()
+
+ft.app(target=main)
