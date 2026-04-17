@@ -1,10 +1,22 @@
 import flet as ft
+import pygame
+
+# initialiser pygame audio
+pygame.mixer.init()
 
 def main(page: ft.Page):
 
-    audio = ft.Audio(src="music.mp3", autoplay=True)
+    # 🎵 charger la musique au démarrage
+    pygame.mixer.music.load("pierre_feuille_ciseaux/music/music.mp3")
+    pygame.mixer.music.play(-1)  # -1 = loop infini
 
-    page.overlay.append(audio)
-    page.update()
+    # 🛑 fonction appelée quand la fenêtre se ferme
+    def on_close(e):
+        pygame.mixer.music.stop()
+
+    # connecter l'événement fermeture
+    page.on_close = on_close
+
+    page.add(ft.Text("App Flet avec musique 🎵"))
 
 ft.app(target=main)

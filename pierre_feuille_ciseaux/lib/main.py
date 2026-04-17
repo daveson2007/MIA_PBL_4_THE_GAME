@@ -5,69 +5,32 @@ import wave
 import threading
 import subprocess
 import random
+import pygame
 from flet import app, Text, Row, ElevatedButton, Container, Column, DecorationImage, BoxFit, Alignment, Image, ColorFilter, BlendMode
+
 
 def get_asset_path(filename: str) -> str:
     return os.path.normpath(os.path.join(os.path.dirname(__file__), os.pardir, "assets", filename))
-
-def generate_music_file(path: str) -> None:
-    if os.path.exists(path):
-        return
-    sample_rate = 44100
-    duration = 12.0
-    amplitude = 12000
-    frequencies = [219.99, 246.94, 293.66, 349.23, 392.00, 440.00, 466.16, 523.25]
-    n_samples = int(duration * sample_rate)
-    
-    with wave.open(path, "w") as wav:
-        wav.setnchannels(1)
-        wav.setsampwidth(2)
-        wav.setframerate(sample_rate)
-        frames = bytearray()
-        
-        for i in range(n_samples):
-            t = i / sample_rate
-            freq_index = int((i / sample_rate) * len(frequencies))
-            freq = frequencies[freq_index % len(frequencies)]
-            
-            envelope = 1.0 if (i // (sample_rate // 4)) % 2 == 0 else 0.7
-            value = int(amplitude * envelope * math.sin(2 * math.pi * freq * t))
-            frames.extend(struct.pack("<h", value))
-        
-        wav.writeframes(frames)
-
-
-def start_background_music() -> None:
-    music_path = get_asset_path("music_jjk.wav")
-    generate_music_file(music_path)
-    
-    def play_music():
-        try:
-            subprocess.Popen(
-                ["powershell", "-NoProfile", "-Command", 
-                 f"$player = New-Object System.Media.SoundPlayer '{music_path}'; $player.PlayLooping()"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                creationflags=0x08000000
-            )
-        except Exception as e:
-            print(f"Erreur musique: {e}")
-    
-    thread = threading.Thread(target=play_music, daemon=True)
-    thread.start()
 
 def main(page):
     page.title = "Pierre Feuille Ciseau"
     page.vertical_alignment = "center"
     page.horizontal_alignment = "center"
 
+    pygame.mixer.init()
+    pygame.mixer.music.load("pierre_feuille_ciseaux/music/music.mp3")
+    pygame.mixer.music.play(-1)  # -1 = loop infini
+    def on_close(e):
+        pygame.mixer.music.stop()
+    page.on_close = on_close
+
     user_score = 0
     comp_score = 0
     choices = [
-        ("Pierre", "assets/pierre.png"),
-        ("Feuille", "assets/papier.png"),
-        ("Ciseau", "assets/ciseaux.png"),
-        ("Puits", "assets/puits.png"),
+        ("Pierre", "pierre_feuille_ciseaux/assets/pierre.png"),
+        ("Feuille", "pierre_feuille_ciseaux/assets/papier.png"),
+        ("Ciseau", "pierre_feuille_ciseaux/assets/ciseaux.png"),
+        ("Puits", "pierre_feuille_ciseaux/assets/puits.png"),
     ]
 
     result_text = Text("Choisis une main pour commencer", size=18, color="white")
@@ -94,7 +57,7 @@ def main(page):
         alignment=Alignment.CENTER,
         border_radius=80,
         image=DecorationImage(
-            src="assets/score.png",
+            src="pierre_feuille_ciseaux/assets/score.png",
             fit=BoxFit.COVER,
             alignment=Alignment.CENTER,
         ),
@@ -277,5 +240,4 @@ def main(page):
             ),
         )
     )
-start_background_music()
 app(target=main)
