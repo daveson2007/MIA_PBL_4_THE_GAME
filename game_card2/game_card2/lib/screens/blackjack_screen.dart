@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../models/card_model.dart';
 import '../models/deck.dart';
@@ -99,16 +99,18 @@ class _BlackjackScreenState extends State<BlackjackScreen> {
         child: Column(
           children: [
             const Text('Blackjack Casino', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             _scoreText('Score Croupier', calculateScore(dealerHand), hidden: !gameOver),
             const SizedBox(height: 12),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: dealerHand
-                    .map((card) => PlayingCardWidget(
-                          card: card,
-                          faceDown: !gameOver && dealerHand.indexOf(card) == 0,
+                    .asMap()
+                    .entries
+                    .map((entry) => PlayingCardWidget(
+                          card: entry.value,
+                          faceDown: !gameOver && entry.key == 0,
                         ))
                     .toList(),
               ),
@@ -119,9 +121,7 @@ class _BlackjackScreenState extends State<BlackjackScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: playerHand
-                    .map((card) => PlayingCardWidget(card: card))
-                    .toList(),
+                children: playerHand.map((card) => PlayingCardWidget(card: card)).toList(),
               ),
             ),
             const SizedBox(height: 24),

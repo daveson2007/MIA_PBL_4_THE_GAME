@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../models/card_model.dart';
 import '../models/deck.dart';
@@ -99,7 +99,11 @@ class _PokerScreenState extends State<PokerScreen> {
   }
 
   void playTurn() {
-    if (phase == 0 || phase == 2) {
+    if (phase == 0) {
+      resetGame();
+      return;
+    }
+    if (phase == 2) {
       resetGame();
       return;
     }

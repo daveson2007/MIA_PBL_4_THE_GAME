@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../models/card_model.dart';
 import '../models/deck.dart';
@@ -119,7 +119,7 @@ class _PresidentScreenState extends State<PresidentScreen> {
         final card = hand.removeAt(index);
         setState(() {
           tableCards.add(card);
-          statusMessage = 'L’IA ${i + 1} a joué ${card.rank}${card.suit}.';
+          statusMessage = 'L’IA ${i + 1} a joué ${card.label}.';
         });
         return;
       }

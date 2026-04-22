@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'screens/belote_screen.dart';
 import 'screens/blackjack_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/inter_screen.dart';
 import 'screens/memory_screen.dart';
 import 'screens/president_screen.dart';
 import 'screens/poker_screen.dart';
-import 'screens/placeholder_game_screen.dart';
 import 'screens/speed_screen.dart';
 
 void main() {
@@ -33,7 +33,7 @@ class CardGamesApp extends StatelessWidget {
         '/inter': (context) => const InterScreen(),
         '/speed': (context) => const SpeedScreen(),
         '/poker': (context) => const PokerScreen(),
-        '/placeholder': (context) => const PlaceholderGameScreen(),
+        '/belote': (context) => const BeloteScreen(),
       },
     );
   }

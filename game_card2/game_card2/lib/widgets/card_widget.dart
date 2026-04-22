@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../models/card_model.dart';
 
@@ -26,7 +26,7 @@ class PlayingCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          width: 72,
+          width: 70,
           height: 100,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -56,13 +56,13 @@ class PlayingCardWidget extends StatelessWidget {
                     Text(
                       card!.rank,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: card!.color,
                       ),
                     ),
                     Text(
-                      card!.suit,
+                      card!.suitSymbol,
                       style: TextStyle(
                         fontSize: 28,
                         color: card!.color,
@@ -73,7 +73,7 @@ class PlayingCardWidget extends StatelessWidget {
                       child: Text(
                         card!.rank,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: card!.color,
                         ),
                       ),

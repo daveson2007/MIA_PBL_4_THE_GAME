@@ -1,4 +1,4 @@
-import 'dart:math';
+﻿import 'dart:math';
 
 import 'card_model.dart';
 
@@ -29,11 +29,11 @@ class Deck {
     ];
 
     for (final suit in suits) {
-      for (final rank in ranks) {
+      for (final rankMap in ranks) {
         cards.add(CardModel(
           suit: suit,
-          rank: rank['rank'] as String,
-          value: rank['value'] as int,
+          rank: rankMap['rank'] as String,
+          value: rankMap['value'] as int,
         ));
       }
     }

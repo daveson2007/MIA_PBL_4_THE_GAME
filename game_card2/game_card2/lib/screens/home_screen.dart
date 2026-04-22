@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -10,9 +10,9 @@ class HomeScreen extends StatelessWidget {
       {'route': '/memory', 'title': 'Memory', 'subtitle': 'Retrouvez toutes les paires.'},
       {'route': '/president', 'title': 'Président', 'subtitle': 'Jouez une partie stratégique.'},
       {'route': '/inter', 'title': 'L’Inter', 'subtitle': 'Un jeu de la terre simplifié.'},
-      {'route': '/placeholder', 'title': 'Belote', 'subtitle': 'Bientôt disponible.'},
-      {'route': '/speed', 'title': 'Speed', 'subtitle': 'Un jeu de rapidité.'},
+      {'route': '/speed', 'title': 'Speed', 'subtitle': 'Rapidité et réactions.'},
       {'route': '/poker', 'title': 'Poker', 'subtitle': 'Vidéo Poker 5 cartes.'},
+      {'route': '/belote', 'title': 'Belote', 'subtitle': 'Atout et plis simplifiés.'},
     ];
 
     return Scaffold(
@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
                       subtitle: Text(game['subtitle']!),
                       trailing: const Icon(Icons.arrow_forward_ios, size: 18),
                       onTap: () {
-                        Navigator.pushNamed(context, game['route']!, arguments: game['title']);
+                        Navigator.pushNamed(context, game['route']!);
                       },
                     ),
                   );

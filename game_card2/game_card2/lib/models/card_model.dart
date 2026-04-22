@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class CardModel {
   final String suit;
@@ -10,7 +10,26 @@ class CardModel {
     required this.suit,
     required this.rank,
     required this.value,
-  }) : color = (suit == '♥' || suit == '♦') ? Colors.red : Colors.black;
+  }) : color = (suit == '♥' || suit == '♦' || suit == 'Coeur' || suit == 'Carreau') ? Colors.red : Colors.black;
 
-  String get label => '$rank$suit';
+  String get suitSymbol {
+    switch (suit) {
+      case 'Coeur':
+      case '♥':
+        return '♥';
+      case 'Carreau':
+      case '♦':
+        return '♦';
+      case 'Trefle':
+      case '♣':
+        return '♣';
+      case 'Pique':
+      case '♠':
+        return '♠';
+      default:
+        return suit;
+    }
+  }
+
+  String get label => '$rank$suitSymbol';
 }

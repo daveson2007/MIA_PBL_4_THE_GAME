@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../models/card_model.dart';
 import '../models/deck.dart';
@@ -48,10 +48,10 @@ class _InterScreenState extends State<InterScreen> {
   String get activeSuit => discardPile.isEmpty ? '' : discardPile.last.suit;
 
   void _playCard() {
-    if (selectedIndex == null) return;
+    if (selectedIndex == null || discardPile.isEmpty) return;
     final selected = playerHand[selectedIndex!];
-    final top = discardPile.last;
-    final valid = selected.rank == '8' || selected.rank == top.rank || selected.suit == activeSuit;
+    final topCard = discardPile.last;
+    final valid = selected.rank == '8' || selected.rank == topCard.rank || selected.suit == activeSuit;
 
     if (!valid) {
       setState(() => infoMessage = 'Coup invalide !');
@@ -76,8 +76,8 @@ class _InterScreenState extends State<InterScreen> {
   void _drawCard() {
     final card = deck.draw();
     if (card != null) {
-      playerHand.add(card);
       setState(() {
+        playerHand.add(card);
         infoMessage = 'Vous piochez. Tour de l’IA.';
         selectedIndex = null;
       });
@@ -97,14 +97,16 @@ class _InterScreenState extends State<InterScreen> {
       return;
     }
 
-    final top = discardPile.last;
+    final topCard = discardPile.last;
     final playableIndex = aiHand.indexWhere((card) =>
-        card.rank == '8' || card.rank == top.rank || card.suit == activeSuit);
+        card.rank == '8' || card.rank == topCard.rank || card.suit == activeSuit);
 
     if (playableIndex != -1) {
       final card = aiHand.removeAt(playableIndex);
-      setState(() => discardPile.add(card));
-      setState(() => infoMessage = 'L’IA a joué ${card.label}');
+      setState(() {
+        discardPile.add(card);
+        infoMessage = 'L’IA a joué ${card.label}';
+      });
       if (card.rank == 'A') {
         Future.delayed(const Duration(milliseconds: 400), _aiTurn);
         return;
@@ -112,8 +114,8 @@ class _InterScreenState extends State<InterScreen> {
     } else {
       final card = deck.draw();
       if (card != null) {
-        aiHand.add(card);
         setState(() => infoMessage = 'L’IA pioche.');
+        aiHand.add(card);
       } else {
         setState(() => infoMessage = 'L’IA passe.');
       }

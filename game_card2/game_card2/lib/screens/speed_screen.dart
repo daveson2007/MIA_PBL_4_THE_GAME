@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../models/card_model.dart';
 import '../models/deck.dart';
@@ -121,12 +121,10 @@ class _SpeedScreenState extends State<SpeedScreen> {
   }
 
   void resetPiles() {
-    final first = deck.draw();
-    final second = deck.draw();
-    if (first != null && second != null) {
+    if (deck.cards.length >= 2) {
       setState(() {
-        centerPiles[0] = first;
-        centerPiles[1] = second;
+        centerPiles[0] = deck.draw()!;
+        centerPiles[1] = deck.draw()!;
         statusMessage = 'Piles réinitialisées.';
       });
     }
@@ -183,6 +181,7 @@ class _SpeedScreenState extends State<SpeedScreen> {
                 },
               ),
             ),
+            const SizedBox(height: 16),
             Wrap(
               spacing: 12,
               children: [
