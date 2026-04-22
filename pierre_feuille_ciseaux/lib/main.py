@@ -234,7 +234,7 @@ def main(page):
             ),
             expand=True,
             image=DecorationImage(
-                src="assets/fond.png",
+                src="pierre_feuille_ciseaux/assets/fond.png",
                 fit=BoxFit.COVER,
                 alignment=Alignment.CENTER,
             ),
