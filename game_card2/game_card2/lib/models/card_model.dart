@@ -32,4 +32,20 @@ class CardModel {
   }
 
   String get label => '$rank$suitSymbol';
+
+  Map<String, dynamic> toJson() {
+    return {
+      'suit': suit,
+      'rank': rank,
+      'value': value,
+    };
+  }
+
+  factory CardModel.fromJson(Map<String, dynamic> json) {
+    return CardModel(
+      suit: json['suit'],
+      rank: json['rank'],
+      value: json['value'],
+    );
+  }
 }

@@ -31,6 +31,22 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 8),
             const Text('Choisissez un jeu pour commencer :', style: TextStyle(fontSize: 16)),
             const SizedBox(height: 16),
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                title: const Text('Mode Multijoueur LAN'),
+                subtitle: const Text('Jouez avec des amis sur le même réseau.'),
+                trailing: const Icon(Icons.group, size: 24),
+                onTap: () {
+                  Navigator.pushNamed(context, '/multiplayer_lobby');
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text('Jeux solo :', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView.separated(
                 itemCount: games.length,

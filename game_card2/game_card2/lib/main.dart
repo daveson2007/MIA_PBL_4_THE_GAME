@@ -5,6 +5,8 @@ import 'screens/blackjack_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/inter_screen.dart';
 import 'screens/memory_screen.dart';
+import 'screens/multiplayer_blackjack_screen.dart';
+import 'screens/multiplayer_lobby_screen.dart';
 import 'screens/president_screen.dart';
 import 'screens/poker_screen.dart';
 import 'screens/speed_screen.dart';
@@ -34,6 +36,8 @@ class CardGamesApp extends StatelessWidget {
         '/speed': (context) => const SpeedScreen(),
         '/poker': (context) => const PokerScreen(),
         '/belote': (context) => const BeloteScreen(),
+        '/multiplayer_lobby': (context) => const MultiplayerLobbyScreen(),
+        '/multiplayer_blackjack': (context) => const MultiplayerBlackjackScreen(),
       },
     );
   }
