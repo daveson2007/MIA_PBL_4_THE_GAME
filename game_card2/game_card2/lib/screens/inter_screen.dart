@@ -1,8 +1,11 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/card_model.dart';
 import '../models/deck.dart';
 import '../widgets/card_widget.dart';
+import '../services/supabase_service.dart';
+import 'online_inter_screen.dart';
 
 class InterScreen extends StatefulWidget {
   const InterScreen({super.key});
@@ -125,7 +128,7 @@ class _InterScreenState extends State<InterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('L’Inter')),
+      appBar: AppBar(title: const Text('L’Inter'), actions: [IconButton(onPressed: _openOnlineDialog, icon: const Icon(Icons.cloud))]),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -185,5 +188,94 @@ class _InterScreenState extends State<InterScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _openOnlineDialog() async {
+    final TextEditingController joinController = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Jeu en ligne — L\'Inter'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(ctx).pop();
+                await _createOnlineRoom();
+              },
+              child: const Text('Créer une room en ligne'),
+            ),
+            const SizedBox(height: 12),
+            TextField(controller: joinController, decoration: const InputDecoration(labelText: 'Room ID (pour rejoindre)')),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final id = joinController.text.trim();
+              if (id.isEmpty) return;
+              Navigator.of(ctx).pop();
+              await _joinOnlineRoom(id);
+            },
+            child: const Text('Rejoindre'),
+          ),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Annuler')),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _createOnlineRoom() async {
+    try {
+      final initialState = <String, dynamic>{
+        'deck': deck.cards.map((c) => c.toJson()).toList(),
+        'hands': {SupabaseService.I.playerId: playerHand.map((c) => c.toJson()).toList()},
+        'discard': discardPile.map((c) => c.toJson()).toList(),
+        'turn': SupabaseService.I.playerId,
+        'phase': 'playing',
+        'info': 'Partie créée en ligne',
+        'reserved': aiHand.map((c) => c.toJson()).toList(),
+      };
+
+      final roomId = await SupabaseService.I.createRoom('inter', initialState);
+      if (roomId == null) throw Exception('Création échouée');
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Room créée'),
+          content: SelectableText(roomId),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: roomId));
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ID copié')));
+              },
+              child: const Text('Copier'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                Navigator.push(context, MaterialPageRoute(builder: (_) => OnlineInterScreen(roomId: roomId)));
+              },
+              child: const Text('Ouvrir'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur création room: $e')));
+    }
+  }
+
+  Future<void> _joinOnlineRoom(String roomId) async {
+    try {
+      await SupabaseService.I.joinRoom(roomId);
+      if (!mounted) return;
+      Navigator.push(context, MaterialPageRoute(builder: (_) => OnlineInterScreen(roomId: roomId)));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur rejoindre room: $e')));
+    }
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/multiplayer_service.dart';
+import '../services/supabase_service.dart';
+import 'online_room_screen.dart';
 
 class MultiplayerLobbyScreen extends StatefulWidget {
   const MultiplayerLobbyScreen({super.key});
@@ -15,6 +18,9 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
   String? localIp;
   final TextEditingController _ipController = TextEditingController();
   String status = 'Choisissez une option';
+  final TextEditingController _onlineRoomController = TextEditingController();
+  bool _isCreatingOnline = false;
+  bool _isJoiningOnline = false;
 
   @override
   void initState() {
@@ -71,6 +77,75 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
       status = 'Connexion...';
     });
     await _service.joinGame(ip);
+  }
+
+  Future<void> _createOnlineRoom() async {
+    setState(() {
+      _isCreatingOnline = true;
+    });
+    try {
+      final initialState = {
+        'deck': [],
+        'hands': {SupabaseService.I.playerId: []},
+        'table': [],
+        'turn': SupabaseService.I.playerId,
+        'scores': {},
+        'phase': 'waiting'
+      };
+      final roomId = await SupabaseService.I.createRoom('blackjack', initialState);
+      if (roomId == null) throw Exception('Création de la room échouée');
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Room créée'),
+          content: SelectableText(roomId),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: roomId));
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ID copié dans le presse-papiers')));
+              },
+              child: const Text('Copier'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                Navigator.push(context, MaterialPageRoute(builder: (_) => OnlineRoomScreen(roomId: roomId)));
+              },
+              child: const Text('Ouvrir'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur création room: $e')));
+    } finally {
+      if (mounted) setState(() => _isCreatingOnline = false);
+    }
+  }
+
+  Future<void> _joinOnlineRoom() async {
+    final roomId = _onlineRoomController.text.trim();
+    if (roomId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Entrez un ID de room')));
+      return;
+    }
+    setState(() {
+      _isJoiningOnline = true;
+    });
+    try {
+      await SupabaseService.I.joinRoom(roomId);
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => OnlineRoomScreen(roomId: roomId)),
+      );
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur rejoindre room: $e')));
+    } finally {
+      if (mounted) setState(() => _isJoiningOnline = false);
+    }
   }
 
   @override
@@ -131,6 +206,37 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
               child: Text(isConnecting ? 'Connexion...' : 'Rejoindre la partie'),
             ),
             const SizedBox(height: 24),
+            const Divider(),
+            const SizedBox(height: 12),
+            const Text('Multijoueur en ligne (Supabase)', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _onlineRoomController,
+              decoration: const InputDecoration(
+                labelText: 'Room ID (pour rejoindre)',
+                hintText: 'Entrez l\'ID de la room à rejoindre',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _isCreatingOnline ? null : _createOnlineRoom,
+                    child: Text(_isCreatingOnline ? 'Création...' : 'Créer une room en ligne'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _isJoiningOnline ? null : _joinOnlineRoom,
+                    child: Text(_isJoiningOnline ? 'Connexion...' : 'Rejoindre room en ligne'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             const Text(
               'Note: Assurez-vous que les appareils sont sur le même réseau Wi-Fi.',
               style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -146,6 +252,7 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
   void dispose() {
     _service.disconnect();
     _ipController.dispose();
+    _onlineRoomController.dispose();
     super.dispose();
   }
 }
